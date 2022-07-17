@@ -10,6 +10,8 @@ import android.view.View
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 
+data class SongCardInfo(val name: String, val artist: String, val album: String)
+
 class MusicDB {
     companion object {
         fun getTracks(applicationContext: Context, trackCardView: CardView) {
@@ -43,6 +45,7 @@ class MusicDB {
             }
         }
 
+        // Old when using xml layouts
         fun bindTrackCard(trackCardView: CardView, context: Context, title: String, album: String, artist: String) {
 
         }

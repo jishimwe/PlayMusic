@@ -3,7 +3,17 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/ishim/AndroidStudioProjects/PlayMusic/app/src/main/res/drawable-v24/ic_launcher_background.xml" value="0.1" />
         <entry key="..\:/Users/ishim/AndroidStudioProjects/PlayMusic/app/src/main/res/drawable/ic_album.xml" value="0.1335" />
+        <entry key="..\:/Users/ishim/AndroidStudioProjects/PlayMusic/app/src/main/res/drawable/ic_arrow_back.xml" value="0.1" />
+        <entry key="..\:/Users/ishim/AndroidStudioProjects/PlayMusic/app/src/main/res/drawable/pause.xml" value="0.1" />
+        <entry key="..\:/Users/ishim/AndroidStudioProjects/PlayMusic/app/src/main/res/drawable/play_arrow.xml" value="0.1" />
+        <entry key="..\:/Users/ishim/AndroidStudioProjects/PlayMusic/app/src/main/res/drawable/repeat.xml" value="0.1" />
+        <entry key="..\:/Users/ishim/AndroidStudioProjects/PlayMusic/app/src/main/res/drawable/repeat_on.xml" value="0.1" />
+        <entry key="..\:/Users/ishim/AndroidStudioProjects/PlayMusic/app/src/main/res/drawable/repeat_one.xml" value="0.1" />
+        <entry key="..\:/Users/ishim/AndroidStudioProjects/PlayMusic/app/src/main/res/drawable/shuffle.xml" value="0.1" />
+        <entry key="..\:/Users/ishim/AndroidStudioProjects/PlayMusic/app/src/main/res/drawable/skip_next.xml" value="0.1" />
+        <entry key="..\:/Users/ishim/AndroidStudioProjects/PlayMusic/app/src/main/res/drawable/skip_previous.xml" value="0.1" />
         <entry key="..\:/Users/ishim/AndroidStudioProjects/PlayMusic/app/src/main/res/layout/activity_main.xml" value="0.325" />
         <entry key="..\:/Users/ishim/AndroidStudioProjects/PlayMusic/app/src/main/res/layout/track_card.xml" value="0.5708333333333333" />
         <entry key="app/src/main/res/drawable/ic_album.xml" value="0.1295" />

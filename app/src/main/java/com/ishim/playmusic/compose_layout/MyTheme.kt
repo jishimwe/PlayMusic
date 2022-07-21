@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.material.*
 import androidx.compose.ui.Alignment
@@ -60,24 +61,13 @@ fun MyTheme(
 
 @Composable
 fun SongCard(song: SongCardInfo) {
-//    Row (modifier = Modifier.padding(all = 8.dp)){
-//        Image(
-//            painter = painterResource(id = R.drawable.ic_album),
-//            contentDescription = "Contact profile picture",
-//            modifier = Modifier
-//                .size(50.dp, 50.dp)
-//                .clip(CircleShape)
-//                .border(1.dp, MaterialTheme.colors.secondary, CircleShape)
-//        )
-//    }
     Surface(
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colors.surface,
-        elevation = 4.dp,
+        elevation = 2.dp,
         modifier = Modifier
             .animateContentSize()
-            .padding(1.dp)) {
-
+            .clip(RoundedCornerShape(2.dp))) {
 
         Row(modifier = Modifier.padding(all = 8.dp)) {
             Image(
@@ -139,7 +129,7 @@ fun TrackList(context: Context) {
 @Composable
 @Preview
 fun PreviewSongCard() {
-    val song = SongCardInfo(Uri.EMPTY,"Scream", "Dreamcatcher", "Dystopia : The Tree of Language")
+    val song = SongCardInfo(Uri.EMPTY, "Scream?", "Dreamcatcher?", "1st Album?", "Dummy", 180000, "Dummy data")
     SongCard(song)
 }
 

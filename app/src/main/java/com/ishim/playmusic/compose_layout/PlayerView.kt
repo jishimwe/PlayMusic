@@ -21,10 +21,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ishim.playmusic.R
-import com.ishim.playmusic.SongCardInfo
+import com.ishim.playmusic.Song
 
 @Composable
-fun AlbumArtAndInfo(songCardInfo: SongCardInfo) {
+fun PlayerView() {
+
+}
+
+@Composable
+fun AlbumArtAndInfo(song: Song) {
     Surface(
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colors.surface,
@@ -35,7 +40,7 @@ fun AlbumArtAndInfo(songCardInfo: SongCardInfo) {
     ) {
         Column(modifier = Modifier
             .clickable {}
-            .aspectRatio(.8f)) {
+            .aspectRatio(.8f), horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
                 painter = painterResource(
                     id = R.drawable.ic_album
@@ -51,13 +56,13 @@ fun AlbumArtAndInfo(songCardInfo: SongCardInfo) {
             )
 
             Text(
-                text = songCardInfo.name,
+                text = song.name,
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.padding(4.dp)
             )
 
             Text(
-                text = songCardInfo.artist,
+                text = song.artist,
                 style = MaterialTheme.typography.body1,
                 maxLines = 1,
                 modifier = Modifier
@@ -67,7 +72,7 @@ fun AlbumArtAndInfo(songCardInfo: SongCardInfo) {
             Spacer(modifier = Modifier.width(4.dp))
 
             Text(
-                text = songCardInfo.album,
+                text = song.album,
                 style = MaterialTheme.typography.body1,
                 maxLines = 1,
                 modifier = Modifier
@@ -94,44 +99,53 @@ fun MediaButtonAndProgressBar(duration: Long) {
     ) {
         Column(
             modifier = Modifier
-                .padding(4.dp),
+                .padding(4.dp)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
             var sliderValue by remember { mutableStateOf(0f) }
-
-            Slider(
-                value = sliderValue,
-                onValueChange = { newValue -> sliderValue = newValue },
-                colors = SliderDefaults.colors(),
-                modifier = Modifier.weight(.3f)
-            )
 
             Row(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .fillMaxWidth(2f)
-                    .weight(.2f)
+                    .weight(.3f)
                     .padding(end = 8.dp, start = 8.dp),
-                horizontalArrangement = Arrangement.SpaceAround
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "$timeElapsed",
                     style = MaterialTheme.typography.body2,
                     maxLines = 1,
-                    color = Color(R.color.purple_200)
+                    color = Color(R.color.purple_200),
+                    modifier = Modifier.weight(.15f)
+                )
+
+                Slider(
+                    value = sliderValue,
+                    onValueChange = { newValue -> sliderValue = newValue },
+                    colors = SliderDefaults.colors(),
+                    modifier = Modifier.weight(.8f)
                 )
 
                 Text(
                     text = "$duration",
                     style = MaterialTheme.typography.body2,
                     maxLines = 1,
-                    color = Color(R.color.purple_200)
+                    color = Color(R.color.purple_200),
+                    modifier = Modifier.weight(.15f)
                 )
             }
 
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
-            Row(modifier = Modifier.align(Alignment.CenterHorizontally).weight(.5f)) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .weight(.7f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.repeat),
                     contentDescription = "Repeat",
@@ -183,7 +197,7 @@ fun MediaButtonAndProgressBar(duration: Long) {
 @Preview
 @Composable
 fun AlbumArtAndInfoPreview() {
-    val song = SongCardInfo(
+    val song = Song(
         Uri.EMPTY,
         "Scream?",
         "Dreamcatcher?",
@@ -193,7 +207,7 @@ fun AlbumArtAndInfoPreview() {
         "Dummy data"
     )
     Column {
-        AlbumArtAndInfo(songCardInfo = song)
+        AlbumArtAndInfo(song = song)
         MediaButtonAndProgressBar(duration = 180000)
     }
 }

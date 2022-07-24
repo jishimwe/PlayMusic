@@ -1,14 +1,11 @@
 package com.ishim.playmusic
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment.isExternalStorageManager
 import android.provider.MediaStore
-import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -16,7 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.ishim.playmusic.compose_layout.MyTheme
-import com.ishim.playmusic.compose_layout.TrackList
+import com.ishim.playmusic.compose_layout.ScaffoldBarsGeneric
 
 private const val TAG = "MAIN ACTIVITY"
 const val MANAGE_MEDIA_REQUEST_CODE = 1
@@ -40,7 +37,8 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             MyTheme {
-                TrackList(context = this)
+//                ScaffoldBars(songs = MusicDB.getTracks(this))
+                ScaffoldBarsGeneric(context = this, list = listOf())
             }
         }
     }

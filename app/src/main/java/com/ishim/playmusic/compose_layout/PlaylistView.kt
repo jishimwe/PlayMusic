@@ -39,7 +39,7 @@ fun PlaylistCard(playlist: Playlist) {
             )
 
             Text(
-                text = "${playlist.songs.size}",
+                text = "23", // TODO: Hard coding is not ok... -> add playlist count
                 style = MaterialTheme.typography.subtitle1
             )
         }

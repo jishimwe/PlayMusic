@@ -17,48 +17,50 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ishim.playmusic.R
 import com.ishim.playmusic.Song
-
-@Composable
-fun PlayerView() {
-
-}
+import com.ishim.playmusic.timeFormat
+import java.time.Instant
+import java.time.LocalTime
+import java.time.ZoneId
 
 @Composable
 fun AlbumArtAndInfo(song: Song) {
-    Surface(
+    Card(
         shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colors.surface,
+        backgroundColor = MaterialTheme.colors.surface,
         modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
+            .scale(.95f)
+            .clip(RoundedCornerShape(24.dp))
             .animateContentSize()
-            .scale(.9f)
     ) {
         Column(modifier = Modifier
             .clickable {}
-            .aspectRatio(.8f), horizontalAlignment = Alignment.CenterHorizontally) {
+            .aspectRatio(.8f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Image(
                 painter = painterResource(
                     id = R.drawable.ic_album
                 ),
                 contentDescription = "Album default image",
                 modifier = Modifier
-                    .padding(2.dp)
                     .aspectRatio(1f)
                     .border(1.dp, MaterialTheme.colors.primary, RoundedCornerShape(24.dp))
                     .clip(RoundedCornerShape(24.dp))
                     .shadow(2.dp)
                     .align(Alignment.CenterHorizontally)
+                    .fillMaxWidth()
             )
 
             Text(
                 text = song.name,
-                style = MaterialTheme.typography.h6,
-                modifier = Modifier.padding(4.dp)
+                style = MaterialTheme.typography.h6
             )
 
             Text(
@@ -88,14 +90,21 @@ fun MediaButtonAndProgressBar(duration: Long) {
     val timeElapsed by remember {
         mutableStateOf(0)
     }
-    Surface(
+    val instantElapsed = Instant.ofEpochMilli(timeElapsed.toLong())
+    val durElapsed = LocalTime.ofInstant(instantElapsed, ZoneId.systemDefault())
+
+    val instant = Instant.ofEpochMilli(duration)
+    val dur = LocalTime.ofInstant(instant, ZoneId.systemDefault())
+
+    Card(
         shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colors.surface,
+        backgroundColor = MaterialTheme.colors.surface,
         modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
+            .scale(.95f)
+            .clip(RoundedCornerShape(24.dp))
             .animateContentSize()
-            .scale(.9f)
-            .fillMaxHeight(.6f)
+            .fillMaxHeight(.5f)
+//            .wrapContentSize()
     ) {
         Column(
             modifier = Modifier
@@ -115,10 +124,10 @@ fun MediaButtonAndProgressBar(duration: Long) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "$timeElapsed",
+                    text = timeFormat.format(durElapsed),
                     style = MaterialTheme.typography.body2,
                     maxLines = 1,
-                    color = Color(R.color.purple_200),
+                    color = MaterialTheme.colors.onSecondary,
                     modifier = Modifier.weight(.15f)
                 )
 
@@ -130,10 +139,10 @@ fun MediaButtonAndProgressBar(duration: Long) {
                 )
 
                 Text(
-                    text = "$duration",
+                    text = timeFormat.format(dur),
                     style = MaterialTheme.typography.body2,
                     maxLines = 1,
-                    color = Color(R.color.purple_200),
+                    color = MaterialTheme.colors.onSecondary,
                     modifier = Modifier.weight(.15f)
                 )
             }
@@ -143,61 +152,100 @@ fun MediaButtonAndProgressBar(duration: Long) {
             Row(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .weight(.7f),
-                verticalAlignment = Alignment.CenterVertically
+                    .weight(.7f)
+                    .padding(start = 8.dp, end = 8.dp)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.repeat),
-                    contentDescription = "Repeat",
-                    Modifier
-                        .scale(.5f)
-                        .padding(end = 32.dp)
-                )
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.repeat),
+                        contentDescription = "Repeat",
+                        Modifier
+                            .scale(.5f)
+//                            .padding(end = 32.dp)
+                    )
+                }
 
-                Image(
-                    painter = painterResource(id = R.drawable.skip_previous),
-                    contentDescription = "Previous",
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(.5.dp))
-                        .padding(start = 8.dp, end = 8.dp)
-                )
+                Spacer(modifier = Modifier.width(48.dp))
 
-                Image(
-                    painter = painterResource(id = R.drawable.play_arrow),
-                    contentDescription = "Play",
-                    modifier = Modifier
-                        .scale(1.25f)
-                        .clip(CircleShape)
-                        .border(.5.dp, MaterialTheme.colors.primary, CircleShape)
-                        .padding(start = 8.dp, end = 8.dp)
-                        .background(MaterialTheme.colors.surface)
-                )
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.skip_previous),
+                        contentDescription = "Previous",
+//                        modifier = Modifier
+//                            .clip(RoundedCornerShape(.5.dp))
+//                            .padding(start = 8.dp, end = 8.dp)
+                    )
+                }
 
-                Image(
-                    painter = painterResource(id = R.drawable.skip_next),
-                    contentDescription = "Next",
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(.5.dp))
-                        .padding(start = 8.dp, end = 8.dp)
-                )
+//                Spacer(modifier = Modifier.width(16.dp))
 
-                Image(
-                    painter = painterResource(id = R.drawable.shuffle),
-                    contentDescription = "Shuffle",
-                    Modifier
-                        .scale(.5f)
-                        .padding(start = 32.dp)
-                )
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.play_arrow),
+                        contentDescription = "Play",
+                        modifier = Modifier
+                            .scale(1.25f)
+                            .background(MaterialTheme.colors.surface)
+                            .border(.5.dp, MaterialTheme.colors.primary, CircleShape)
+                            .clip(CircleShape)
+//                            .padding(start = 8.dp, end = 8.dp)
+                    )
+                }
+
+//                Spacer(modifier = Modifier.width(16.dp))
+
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.skip_next),
+                        contentDescription = "Next",
+//                        modifier = Modifier
+//                            .clip(RoundedCornerShape(.5.dp))
+//                            .padding(start = 8.dp, end = 8.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(48.dp))
+
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.shuffle),
+                        contentDescription = "Shuffle",
+                        Modifier
+                            .scale(.5f)
+//                            .padding(start = 32.dp)
+                    )
+                }
             }
         }
 
     }
 }
 
+@Composable
+fun PlayingView(song: Song) {
+        Column(
+            verticalArrangement = Arrangement.SpaceAround,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
+            AlbumArtAndInfo(song = song)
+
+            Spacer(modifier = Modifier.width(18.dp))
+
+            MediaButtonAndProgressBar(duration = song.duration)
+        }
+}
+
 @Preview
 @Composable
 fun AlbumArtAndInfoPreview() {
     val song = Song(
+        123456789,
         Uri.EMPTY,
         "Scream?",
         "Dreamcatcher?",
@@ -206,8 +254,5 @@ fun AlbumArtAndInfoPreview() {
         180000,
         "Dummy data"
     )
-    Column {
-        AlbumArtAndInfo(song = song)
-        MediaButtonAndProgressBar(duration = 180000)
-    }
+    PlayingView(song = song)
 }

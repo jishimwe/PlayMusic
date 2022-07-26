@@ -25,11 +25,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ishim.playmusic.*
-import com.ishim.playmusic.MusicDB.Companion.getAlbums
-import com.ishim.playmusic.MusicDB.Companion.getArtists
-import com.ishim.playmusic.MusicDB.Companion.getTracks
+import com.ishim.playmusic.MusicDB
 import com.ishim.playmusic.R
+import com.ishim.playmusic.Song
 
 data class AppBarState(
     val title: String = "",
@@ -118,7 +116,7 @@ fun ScaffoldBars(songs: List<Song>) {
 
 @Composable
 //fun ScaffoldBarsGeneric(list: List<Any>, contentView: (input: List<Any>, padding: PaddingValues) -> Unit) {
-fun ScaffoldBarsGeneric(context: Context, list: List<Any>) {
+fun ScaffoldBarsGeneric(context: Context, list: List<Any>, musicDB: MusicDB?) {
     val appBarState by remember { mutableStateOf(AppBarState()) }
 
     var tabState by rememberSaveable  { mutableStateOf(0) }
@@ -154,10 +152,16 @@ fun ScaffoldBarsGeneric(context: Context, list: List<Any>) {
 
 //            To use with @MusicDB
             when(tabState) {
-                1 -> AlbumCardGrid(list = getAlbums(context), paddingValues = innerPadding)
-                2 -> ArtistsGridView(list = getArtists(context), padding = innerPadding)
+                1 -> if (musicDB != null) {
+                    AlbumCardGrid(list = musicDB.albums, paddingValues = innerPadding)
+                }
+                2 -> if (musicDB != null) {
+                    ArtistsGridView(list = musicDB.artists, padding = innerPadding)
+                }
                 3 -> PlaylistCardList(list = DUMMY_PLAYLISTS, padding = innerPadding)
-                else -> TrackList(list = getTracks(context), padding = innerPadding)
+                else -> if (musicDB != null) {
+                    TrackList(list = musicDB.songs, padding = innerPadding)
+                }
             }
         },
         bottomBar = {
@@ -263,7 +267,7 @@ fun MyTabsGeneric(selectedTab: Int, onSelectedTab: (Int) -> Unit) {
 fun BottomPlayerBar() {
     Surface(
         Modifier
-            .clip(RoundedCornerShape(24))
+            .clip(RoundedCornerShape(48))
             .height(54.dp)
             .fillMaxWidth(.95f)
             .background(MaterialTheme.colors.primary, RoundedCornerShape(24))
@@ -327,7 +331,7 @@ fun BottomPlayerBar() {
 @Composable
 @Preview
 fun PreviewTabs() {
-    MyTheme() {
+    MyTheme {
         MyTabs()
     }
 }
@@ -354,6 +358,7 @@ fun PreviewSongList() {
     val songs = mutableListOf<Song>()
     for (i in 0..12) {
         songs += Song(
+            i.toLong(),
             Uri.EMPTY,
             "Scream$i",
             "Dreamcatcher?",
@@ -363,8 +368,10 @@ fun PreviewSongList() {
             "Dummy data"
         )
     }
-    Column(modifier = Modifier.padding(8.dp)) {
-        ScaffoldBarsGeneric(LocalContext.current, songs)
+    MyTheme {
+        Column(modifier = Modifier.padding(8.dp)) {
+            ScaffoldBarsGeneric(LocalContext.current, songs, null)
+    }
 
 /*        val listState = rememberLazyListState()
         LazyColumn(

@@ -7,10 +7,13 @@ package com.ishim.playmusic.compose_layout
 import android.net.Uri
 import com.ishim.playmusic.Album
 import com.ishim.playmusic.Artist
+import com.ishim.playmusic.MusicDB.Companion.getAlbums
+import com.ishim.playmusic.MusicDB.Companion.getTracks
 import com.ishim.playmusic.Playlist
 import com.ishim.playmusic.Song
 
 val DUMMY_SONG = Song(
+    1,
     Uri.EMPTY,
     "Scream?",
     "Dreamcatcher?",
@@ -22,6 +25,7 @@ val DUMMY_SONG = Song(
 
 val DUMMY_SONG_LIST = listOf(
     Song(
+        2,
         Uri.EMPTY,
         "Scream?",
         "Dreamcatcher?",
@@ -30,6 +34,7 @@ val DUMMY_SONG_LIST = listOf(
         180000,
         "Dummy data"),
     Song(
+        3,
         Uri.EMPTY,
         "Scream2?",
         "Dreamcatcher?",
@@ -38,6 +43,7 @@ val DUMMY_SONG_LIST = listOf(
         180000,
         "Dummy data"),
     Song(
+        4,
         Uri.EMPTY,
         "Scream3?",
         "Dreamcatcher?",
@@ -46,6 +52,7 @@ val DUMMY_SONG_LIST = listOf(
         180000,
         "Dummy data"),
     Song(
+        0,
         Uri.EMPTY,
         "Scream4?",
         "Dreamcatcher?",
@@ -54,6 +61,7 @@ val DUMMY_SONG_LIST = listOf(
         180000,
         "Dummy data"),
     Song(
+        11,
         Uri.EMPTY,
         "Scream5?",
         "Dreamcatcher?",
@@ -62,6 +70,7 @@ val DUMMY_SONG_LIST = listOf(
         180000,
         "Dummy data"),
     Song(
+        45,
         Uri.EMPTY,
         "Scream6?",
         "Dreamcatcher?",
@@ -70,6 +79,7 @@ val DUMMY_SONG_LIST = listOf(
         180000,
         "Dummy data"),
     Song(
+        485,
         Uri.EMPTY,
         "Scream7?",
         "Dreamcatcher?",
@@ -78,6 +88,7 @@ val DUMMY_SONG_LIST = listOf(
         180000,
         "Dummy data"),
     Song(
+        886496541,
         Uri.EMPTY,
         "Scream8?",
         "Dreamcatcher?",
@@ -86,6 +97,7 @@ val DUMMY_SONG_LIST = listOf(
         180000,
         "Dummy data"),
     Song(
+        1478532,
         Uri.EMPTY,
         "Scream9?",
         "Dreamcatcher?",
@@ -94,6 +106,7 @@ val DUMMY_SONG_LIST = listOf(
         180000,
         "Dummy data"),
     Song(
+        1254,
         Uri.EMPTY,
         "Scream10?",
         "Dreamcatcher?",
@@ -102,6 +115,7 @@ val DUMMY_SONG_LIST = listOf(
         180000,
         "Dummy data"),
     Song(
+        123456789,
         Uri.EMPTY,
         "Scream11?",
         "Dreamcatcher?",
@@ -115,17 +129,17 @@ val DUMMY_PLAYLISTS = listOf(
     Playlist(
         Uri.EMPTY,
         "Play list 1",
-        DUMMY_SONG_LIST
+        ::getTracks
     ),
     Playlist(
         Uri.EMPTY,
         "Play list 2",
-        DUMMY_SONG_LIST
+        ::getTracks
     ),
     Playlist(
         Uri.EMPTY,
         "Play list 3",
-        DUMMY_SONG_LIST
+        ::getTracks
     )
 )
 
@@ -134,25 +148,25 @@ val DUMMY_ALBUM_LIST = listOf(
         Uri.EMPTY,
         "++",
         "Loona",
-        DUMMY_SONG_LIST
+        ::getTracks
     ),
     Album(
         Uri.EMPTY,
         "Ice",
         "Hyolin",
-        DUMMY_SONG_LIST
+        ::getTracks
     ),
     Album(
         Uri.EMPTY,
         "Would you like?",
         "WJSN",
-        DUMMY_SONG_LIST
+        ::getTracks
     ),
     Album(
         Uri.EMPTY,
         "Dystopia : The Tree of Language",
         "Dreamcatcher",
-        DUMMY_SONG_LIST
+        ::getTracks
     )
 )
 
@@ -160,22 +174,22 @@ val DUMMY_ARTIST_LIST = listOf(
     Artist(
         Uri.EMPTY,
         "Loona",
-        DUMMY_ALBUM_LIST
+        ::getAlbums
     ),
     Artist(
         Uri.EMPTY,
         "Hyolin",
-        DUMMY_ALBUM_LIST
+        ::getAlbums
     ),
     Artist(
         Uri.EMPTY,
         "Dreamcatcher",
-        DUMMY_ALBUM_LIST
+        ::getAlbums
     )
 )
 
 val DUMMY_ARTIST = Artist(
     Uri.EMPTY,
     "Dreamcatcher",
-    DUMMY_ALBUM_LIST
+    ::getAlbums
 )

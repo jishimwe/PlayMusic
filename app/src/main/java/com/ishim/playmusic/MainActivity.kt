@@ -4,8 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment.isExternalStorageManager
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -32,13 +30,15 @@ class MainActivity : AppCompatActivity() {
         checkPermission(Manifest.permission.ACCESS_MEDIA_LOCATION, ACCESS_MEDIA_LOCATION_CODE)*/
         checkPermissions()
 
-        Log.d(TAG, "Media Manage ${MediaStore.canManageMedia(this)} -- ${Manifest.permission.MANAGE_MEDIA}")
-        Log.d(TAG, "Access External Storage ${isExternalStorageManager()}")
+/*        Log.d(TAG, "Media Manage ${MediaStore.canManageMedia(this)} -- ${Manifest.permission.MANAGE_MEDIA}")
+        Log.d(TAG, "Access External Storage ${isExternalStorageManager()}")*/
+
+        val musicDB = MusicDB(this)
 
         setContent {
             MyTheme {
 //                ScaffoldBars(songs = MusicDB.getTracks(this))
-                ScaffoldBarsGeneric(context = this, list = listOf())
+                ScaffoldBarsGeneric(context = this, list = listOf(), musicDB)
             }
         }
     }

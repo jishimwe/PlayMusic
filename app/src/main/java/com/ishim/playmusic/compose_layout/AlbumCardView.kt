@@ -68,6 +68,7 @@ fun MusicGridPreview() {
     val songs = mutableListOf<Song>()
     for (i in 0..12) {
         songs += Song(
+            i.toLong(),
             Uri.EMPTY,
             "Scream$i",
             "Dreamcatcher?",

@@ -1,16 +1,16 @@
 package com.ishim.playmusic
 
 import android.content.ContentUris
-
 import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.provider.MediaStore.Audio.Playlists
 import android.util.Log
+import java.time.format.DateTimeFormatter
 
 
 data class Song(
+    val id: Long,
     val uri: Uri,
     val name: String,
     val artist: String,
@@ -24,31 +24,44 @@ data class Album(
     val uri: Uri,
     val name: String,
     val artist: String,
-    val songs: List<Song>
+    val songs: ((applicationContext: Context, albumFilter: String) -> List<Song>)
 )
 
 data class Artist(
     val uri: Uri,
     val name: String,
-    val albums: List<Album>
+    val albums: ((applicationContext: Context, artistFilter: String) -> List<Album>)
 )
 
 data class Playlist(
     val uri: Uri,
     val name: String,
-    val songs: List<Song>
+    val songs: ((applicationContext: Context, playlistFilter: String) -> List<Song>)
 )
 
 private const val TAG = "MusicDB"
+val timeFormat = DateTimeFormatter.ofPattern("mm:ss")
 
-class MusicDB {
+//class MusicDB (songs: List<Song>, albums: List<Album>, artists: List<Artist>, playlists: List<Playlist>){
+class MusicDB(context: Context) {
+
+/*    var songs = songs
+    var albums = albums
+    var artists = artists
+    var playlists = playlists*/
+
+    var songs = getTracks(context)
+    var albums = getAlbums(context)
+    var artists = getArtists(context)
+    var playlists = getPlaylists(context)
 
     companion object {
         fun getTracks(
             applicationContext: Context,
             albumFilter: String? = null,
             artistFilter: String? = null,
-            playlistFilter: String? = null
+            playlistFilter: String? = null,
+            songdId: Long? = null
         ): MutableList<Song> {
 
             val trackList = mutableListOf<Song>()
@@ -59,7 +72,7 @@ class MusicDB {
                 MediaStore.Audio.Media.ARTIST,
                 MediaStore.Audio.Media.DISPLAY_NAME,
                 MediaStore.Audio.Media.DURATION,
-                MediaStore.Audio.Media.DATA
+                MediaStore.Audio.Media.DATA,
             )
 
             val collection =
@@ -78,6 +91,10 @@ class MusicDB {
             if (artistFilter != null) {
                 selection += " AND (${MediaStore.Audio.Media.ARTIST} = ?)"
                 selectionArgs += "$artistFilter"
+            }
+            if (songdId != null) {
+                selection += "AND (${MediaStore.Audio.Media._ID} = ?)"
+                selectionArgs += "$songdId"
             }
             // TODO: Add playlist filter
 
@@ -121,6 +138,7 @@ class MusicDB {
                     val dataName = cursor.getString(data)
                     Log.d(TAG, "Track - $trackName \t Artist - $artistName \t Album - $albumName")
                     val song = Song(
+                        id,
                         contentUri,
                         trackName,
                         artistName,
@@ -134,6 +152,7 @@ class MusicDB {
             }
             if (trackList.isEmpty())
                 trackList += Song(
+                    1001,
                     Uri.EMPTY,
                     "Scream?",
                     "Dreamcatcher?",
@@ -145,7 +164,10 @@ class MusicDB {
             return trackList
         }
 
-        fun getAlbums(applicationContext: Context, artistFilter: String? = null): MutableList<Album> {
+        fun getAlbums(
+            applicationContext: Context,
+            artistFilter: String? = null
+        ): MutableList<Album> {
             val albumList = mutableListOf<Album>()
             val projection = arrayOf(
                 MediaStore.Audio.Albums.ALBUM_ID,
@@ -197,7 +219,7 @@ class MusicDB {
                         uri = albumUri,
                         name = albumName,
                         artist = artist,
-                        songs = getTracks(applicationContext, albumFilter = albumName)
+                        songs = ::getTracks
                     )
                     albumList += album
                 }
@@ -243,7 +265,12 @@ class MusicDB {
                     val artistName = cursor.getString(artistCol)
                     val artistUri = ContentUris.withAppendedId(collection, id)
 
-                    val artist = Artist(artistUri, artistName, getAlbums(applicationContext, artistName))
+                    val artist =
+                        Artist(
+                            artistUri,
+                            artistName,
+                            ::getAlbums
+                        )
 
                     artistList += artist
                 }

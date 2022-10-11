@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name" translatable="false">PlayMusic</string>
+    <string name="tracks_tab">Tracks</string>
+    <string name="playlists_tab">Playlists</string>
+    <string name="albums_tab">Albums</string>
+    <string name="artists_tab">Artists</string>
+    <string name="files_tab">Files</string>
+    <string name="album_default_image">Album default image</string>
+    <string name="track_title">Track Title</string>
+    <string name="artist">Artist</string>
+    <string name="album">Album</string>
+</resources>

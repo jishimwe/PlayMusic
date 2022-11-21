@@ -2,4 +2,4 @@
 
 Music player for android (Kotlin & Jetpack project)
 
-Remote modification
+Modification remote

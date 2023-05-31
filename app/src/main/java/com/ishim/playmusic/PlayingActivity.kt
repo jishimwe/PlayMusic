@@ -22,3 +22,4 @@ class PlayingActivity : AppCompatActivity() {
         }
     }
 }
+// Remote changes

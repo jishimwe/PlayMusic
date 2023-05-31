@@ -2,4 +2,4 @@
 
 Music player for android (Kotlin & Jetpack project)
 
-Modification Locale
+Modification Locale 2: Electric boogaloo

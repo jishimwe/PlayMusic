@@ -33,4 +33,5 @@
     </application>
 </manifest>
 <!-- This will generate conflict (local) -->
+<!-- This will generate conflict (remote) -->
 

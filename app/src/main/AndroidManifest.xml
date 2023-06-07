@@ -33,4 +33,5 @@
     </application>
 </manifest>
 <!-- This will generate conflict (dm) -->
+<!-- This will generate conflict (clover) -->
 

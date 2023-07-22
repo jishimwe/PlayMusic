@@ -25,20 +25,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        /*checkPermission(Manifest.permission.MANAGE_MEDIA, MANAGE_MEDIA_REQUEST_CODE)
-        checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE_CODE)
-        checkPermission(Manifest.permission.ACCESS_MEDIA_LOCATION, ACCESS_MEDIA_LOCATION_CODE)*/
         checkPermissions()
 
-/*        Log.d(TAG, "Media Manage ${MediaStore.canManageMedia(this)} -- ${Manifest.permission.MANAGE_MEDIA}")
-        Log.d(TAG, "Access External Storage ${isExternalStorageManager()}")*/
-
         val musicDB = MusicDB(this)
+
+//        val currentlyPlaying = CurrentlyPlaying(this, MediaPlayer(), null)
 
         setContent {
             MyTheme {
 //                ScaffoldBars(songs = MusicDB.getTracks(this))
-                ScaffoldBarsGeneric(context = this, list = listOf(), musicDB)
+                ScaffoldBarsGeneric(context = this, list = listOf(), musicDB, null)
             }
         }
     }
@@ -106,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 //            startActivity(intent)
             ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
         } else {
-            Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT)
+            Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show()
         }
     }
 

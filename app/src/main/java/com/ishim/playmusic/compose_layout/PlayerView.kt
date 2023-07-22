@@ -3,7 +3,6 @@ package com.ishim.playmusic.compose_layout
 import android.net.Uri
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,12 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ishim.playmusic.CurrentlyPlaying
 import com.ishim.playmusic.R
 import com.ishim.playmusic.Song
 import com.ishim.playmusic.timeFormat
@@ -30,7 +31,12 @@ import java.time.LocalTime
 import java.time.ZoneId
 
 @Composable
-fun AlbumArtAndInfo(song: Song) {
+fun AlbumArtAndInfo(song: Song, viewModel: PlayMusicViewModel = viewModel()) {
+    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
+//    val album = MusicDB.getAlbums(context, song.album)
+//    val albumArt = MusicDB.getAlbumArt(context, album[0].id)
+
     Card(
         shape = MaterialTheme.shapes.large,
         backgroundColor = MaterialTheme.colors.surface,
@@ -59,12 +65,14 @@ fun AlbumArtAndInfo(song: Song) {
             )
 
             Text(
-                text = song.name,
+//                text = song.name,
+                text = uiState.song?.name ?: "VIEW MODEL FAIL: title",
                 style = MaterialTheme.typography.h6
             )
 
             Text(
-                text = song.artist,
+//                text = song.artist,
+                text = uiState.song?.artist ?: "VIEW MODEL FAIL: artist",
                 style = MaterialTheme.typography.body1,
                 maxLines = 1,
                 modifier = Modifier
@@ -74,7 +82,8 @@ fun AlbumArtAndInfo(song: Song) {
             Spacer(modifier = Modifier.width(4.dp))
 
             Text(
-                text = song.album,
+//                text = song.album,
+                text = uiState.song?.album ?: "VIEW MODEL FAIL: album",
                 style = MaterialTheme.typography.body1,
                 maxLines = 1,
                 modifier = Modifier
@@ -86,15 +95,27 @@ fun AlbumArtAndInfo(song: Song) {
 }
 
 @Composable
-fun MediaButtonAndProgressBar(duration: Long) {
+fun MediaButtonAndProgressBar(
+    song: Song,
+    currentlyPlaying: CurrentlyPlaying?,
+    viewModel: PlayMusicViewModel = viewModel()
+) {
     val timeElapsed by remember {
         mutableStateOf(0)
     }
     val instantElapsed = Instant.ofEpochMilli(timeElapsed.toLong())
     val durElapsed = LocalTime.ofInstant(instantElapsed, ZoneId.systemDefault())
-
-    val instant = Instant.ofEpochMilli(duration)
+    val instant = Instant.ofEpochMilli(song.duration)
     val dur = LocalTime.ofInstant(instant, ZoneId.systemDefault())
+
+    val context = LocalContext.current
+
+    currentlyPlaying?.playSong(song, context)
+    val uiState by viewModel.uiState.collectAsState()
+
+    var playing by remember {
+        mutableStateOf(true)
+    }
 
     Card(
         shape = MaterialTheme.shapes.medium,
@@ -182,13 +203,24 @@ fun MediaButtonAndProgressBar(duration: Long) {
 
 //                Spacer(modifier = Modifier.width(16.dp))
 
-                IconButton(onClick = { /*TODO*/ }) {
+                IconButton(onClick = {
+                    playing = if (playing) {
+                        currentlyPlaying?.pauseSong(song, context)
+                        false
+                    } else {
+                        currentlyPlaying?.playSong(song, context)
+                        true
+                    }
+                }) {
                     Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.play_arrow),
+                        imageVector = if (!playing) {
+                            ImageVector.vectorResource(id = R.drawable.play_arrow)
+                        } else {
+                            ImageVector.vectorResource(id = R.drawable.pause) },
                         contentDescription = "Play",
                         modifier = Modifier
                             .scale(1.25f)
-                            .background(MaterialTheme.colors.surface)
+//                            .background(MaterialTheme.colors.surface)
                             .border(.5.dp, MaterialTheme.colors.primary, CircleShape)
                             .clip(CircleShape)
 //                            .padding(start = 8.dp, end = 8.dp)
@@ -225,7 +257,7 @@ fun MediaButtonAndProgressBar(duration: Long) {
 }
 
 @Composable
-fun PlayingView(song: Song) {
+fun PlayingView(song: Song, currentlyPlaying: CurrentlyPlaying?, viewModel: PlayMusicViewModel) {
         Column(
             verticalArrangement = Arrangement.SpaceAround,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -233,11 +265,11 @@ fun PlayingView(song: Song) {
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            AlbumArtAndInfo(song = song)
+            AlbumArtAndInfo(song, viewModel)
 
             Spacer(modifier = Modifier.width(18.dp))
 
-            MediaButtonAndProgressBar(duration = song.duration)
+            MediaButtonAndProgressBar(song, currentlyPlaying, viewModel)
         }
 }
 
@@ -254,5 +286,8 @@ fun AlbumArtAndInfoPreview() {
         180000,
         "Dummy data"
     )
-    PlayingView(song = song)
+
+//    val currentlyPlaying = CurrentlyPlaying(LocalContext.current, MediaPlayer(), null, song.id)
+//    val viewModel: PlayMusicViewModel by viewModels()
+    PlayingView(song = song, null, PlayMusicViewModel())
 }

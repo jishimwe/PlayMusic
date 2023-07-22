@@ -1,11 +1,13 @@
 package com.ishim.playmusic.compose_layout
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -25,12 +27,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ishim.playmusic.CurrentlyPlaying
 import com.ishim.playmusic.MusicDB
+import com.ishim.playmusic.PlayingActivity
 import com.ishim.playmusic.R
 import com.ishim.playmusic.Song
 
 data class AppBarState(
-    val title: String = "",
+    val artist: String,
+    val title: String,
     val actions: (@Composable RowScope.() -> Unit)? = null
 )
 
@@ -77,8 +82,8 @@ fun TopBar() {
 }*/
 
 @Composable
-fun ScaffoldBars(songs: List<Song>) {
-    val appBarState by remember { mutableStateOf(AppBarState()) }
+fun ScaffoldBars(songs: List<Song>, songPlaying: Song) {
+    val appBarState by remember { mutableStateOf(AppBarState("artist", "title")) }
 
     Scaffold(
         topBar = {
@@ -108,7 +113,7 @@ fun ScaffoldBars(songs: List<Song>) {
                 modifier = Modifier
                     .wrapContentSize(Alignment.Center)
                     .fillMaxWidth()) {
-                BottomPlayerBar()
+                BottomPlayerBar(songPlaying)
             }
         }
     )
@@ -116,8 +121,8 @@ fun ScaffoldBars(songs: List<Song>) {
 
 @Composable
 //fun ScaffoldBarsGeneric(list: List<Any>, contentView: (input: List<Any>, padding: PaddingValues) -> Unit) {
-fun ScaffoldBarsGeneric(context: Context, list: List<Any>, musicDB: MusicDB?) {
-    val appBarState by remember { mutableStateOf(AppBarState()) }
+fun ScaffoldBarsGeneric(context: Context, list: List<Any>, musicDB: MusicDB?, songPlaying: Song?) {
+    val appBarState by remember { mutableStateOf(AppBarState(songPlaying?.artist ?: "artist", songPlaying?.name ?: "title")) }
 
     var tabState by rememberSaveable  { mutableStateOf(0) }
 
@@ -170,7 +175,7 @@ fun ScaffoldBarsGeneric(context: Context, list: List<Any>, musicDB: MusicDB?) {
                 modifier = Modifier
                     .wrapContentSize(Alignment.Center)
                     .fillMaxWidth()) {
-                BottomPlayerBar()
+                BottomPlayerBar(songPlaying ?: DUMMY_SONG)
             }
         }
     )
@@ -263,16 +268,30 @@ fun MyTabsGeneric(selectedTab: Int, onSelectedTab: (Int) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BottomPlayerBar() {
+fun BottomPlayerBar(songPlaying: Song) {
+    var playing by remember {
+        mutableStateOf(true)
+    }
+
+    val context = LocalContext.current
+    val intentPlayer = Intent(context, PlayingActivity::class.java)
+
     Surface(
-        Modifier
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier
             .clip(RoundedCornerShape(48))
             .height(54.dp)
             .fillMaxWidth(.95f)
             .background(MaterialTheme.colors.primary, RoundedCornerShape(24))
-            .alpha(.6f),
-        color = MaterialTheme.colors.secondary,
+            .alpha(.8f)
+            .clickable {
+                intentPlayer.putExtra(SONG_ID, songPlaying.id)
+                context.startActivity(intentPlayer)
+            },
+//        backgroundColor = MaterialTheme.colors.secondary,
+//        onClick = { },
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -289,9 +308,9 @@ fun BottomPlayerBar() {
             )
 
             Column(modifier = Modifier.weight(.4f)) {
-                Text(text = "Playing song")
+                Text(text = songPlaying.name ?: "Title")
 
-                Text(text = "Artist")
+                Text(text = songPlaying.artist ?: "Artist")
             }
 
             IconButton(onClick = { /*TODO*/ }, modifier = Modifier.weight(.1f)) {
@@ -306,7 +325,10 @@ fun BottomPlayerBar() {
 
             IconButton(onClick = { /*TODO*/ }, modifier = Modifier.weight(.1f)) {
                 Icon(
-                    painter = painterResource(id = R.drawable.play_arrow),
+                    painter = if (playing)
+                        painterResource(id = R.drawable.play_arrow)
+                    else
+                        painterResource(id = R.drawable.pause),
                     contentDescription = "Play",
                     modifier = Modifier
                         .clip(CircleShape)
@@ -370,7 +392,7 @@ fun PreviewSongList() {
     }
     MyTheme {
         Column(modifier = Modifier.padding(8.dp)) {
-            ScaffoldBarsGeneric(LocalContext.current, songs, null)
+            ScaffoldBarsGeneric(LocalContext.current, songs, null, songs[0])
     }
 
 /*        val listState = rememberLazyListState()

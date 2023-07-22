@@ -145,24 +145,28 @@ val DUMMY_PLAYLISTS = listOf(
 
 val DUMMY_ALBUM_LIST = listOf(
     Album(
+        1,
         Uri.EMPTY,
         "++",
         "Loona",
         ::getTracks
     ),
     Album(
+        2,
         Uri.EMPTY,
         "Ice",
         "Hyolin",
         ::getTracks
     ),
     Album(
+        3,
         Uri.EMPTY,
         "Would you like?",
         "WJSN",
         ::getTracks
     ),
     Album(
+        4,
         Uri.EMPTY,
         "Dystopia : The Tree of Language",
         "Dreamcatcher",

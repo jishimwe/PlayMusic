@@ -4,9 +4,9 @@ import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -52,10 +52,9 @@ fun AlbumCard(album: Album) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AlbumCardGrid(list: List<Album>, paddingValues: PaddingValues) {
-    LazyVerticalGrid(cells = GridCells.Fixed(2)) {
+    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         items(list) { album ->
             AlbumCard(album)
         }

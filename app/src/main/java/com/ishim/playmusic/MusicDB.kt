@@ -1,7 +1,11 @@
 package com.ishim.playmusic
 
+import android.annotation.SuppressLint
+import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -21,6 +25,7 @@ data class Song(
 )
 
 data class Album(
+    val id: Long,
     val uri: Uri,
     val name: String,
     val artist: String,
@@ -44,11 +49,6 @@ val timeFormat = DateTimeFormatter.ofPattern("mm:ss")
 
 //class MusicDB (songs: List<Song>, albums: List<Album>, artists: List<Artist>, playlists: List<Playlist>){
 class MusicDB(context: Context) {
-
-/*    var songs = songs
-    var albums = albums
-    var artists = artists
-    var playlists = playlists*/
 
     var songs = getTracks(context)
     var albums = getAlbums(context)
@@ -76,11 +76,7 @@ class MusicDB(context: Context) {
             )
 
             val collection =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
-                } else {
-                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-                }
+                MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
 
             var selection = "(${MediaStore.Audio.Media.IS_MUSIC} != 0)"
             var selectionArgs = arrayOf<String>()
@@ -154,9 +150,9 @@ class MusicDB(context: Context) {
                 trackList += Song(
                     1001,
                     Uri.EMPTY,
-                    "Scream?",
-                    "Dreamcatcher?",
-                    "1st Album?",
+                    "Title",
+                    "Artist?",
+                    "Album?",
                     "Dummy",
                     180000,
                     "Dummy data"
@@ -176,11 +172,7 @@ class MusicDB(context: Context) {
             )
 
             val collection =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    MediaStore.Audio.Albums.getContentUri(MediaStore.VOLUME_EXTERNAL)
-                } else {
-                    MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
-                }
+                MediaStore.Audio.Albums.getContentUri(MediaStore.VOLUME_EXTERNAL)
 
             var selection: String? = null
             var selectionArgs = arrayOf<String>()
@@ -216,6 +208,7 @@ class MusicDB(context: Context) {
                     Log.d(TAG, "Track - $id \t Artist - $albumName \t Album - $artist")
 
                     val album = Album(
+                        id = id,
                         uri = albumUri,
                         name = albumName,
                         artist = artist,
@@ -236,11 +229,7 @@ class MusicDB(context: Context) {
             )
 
             val collection =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    MediaStore.Audio.Artists.getContentUri(MediaStore.VOLUME_EXTERNAL)
-                } else {
-                    MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI
-                }
+                MediaStore.Audio.Artists.getContentUri(MediaStore.VOLUME_EXTERNAL)
 
             val selection: String? = null
             val selectionArgs = arrayOf<String>()
@@ -276,6 +265,33 @@ class MusicDB(context: Context) {
                 }
             }
             return artistList
+        }
+
+        @SuppressLint("Range")
+        fun getAlbumArt(context: Context, albumId: Long): Bitmap? {
+            val albumArtUri = Uri.parse("content://media/external/audio/albumart")
+            val contentUri = ContentUris.withAppendedId(albumArtUri, albumId)
+
+            val projection = arrayOf(MediaStore.Audio.Albums._ID)
+            val selection = "${MediaStore.Audio.Albums._ID} = ?"
+            val selectionArgs = arrayOf(albumId.toString())
+
+            context.contentResolver.query(contentUri, projection, selection, selectionArgs, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Albums._ID))
+                    val alArt = ContentUris.withAppendedId(albumArtUri, id)
+                    val contentResolver = context.contentResolver
+                    val inputStream = contentResolver.openInputStream(alArt)
+                    val bitmap: Bitmap
+                    if (inputStream != null) {
+                        bitmap = BitmapFactory.decodeStream(inputStream)
+                        inputStream.close()
+                        return bitmap
+                    }
+                }
+            }
+
+            return null
         }
 
         fun getPlaylists(applicationContext: Context) {

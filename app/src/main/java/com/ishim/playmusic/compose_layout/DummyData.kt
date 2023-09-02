@@ -23,6 +23,17 @@ val DUMMY_SONG = Song(
     "Dummy data"
 )
 
+val DEFAULT_SONG = Song(
+    0,
+    Uri.EMPTY,
+    "Title",
+    "Artist",
+    "Album",
+    "No Song",
+    180000,
+    "Default Song"
+)
+
 val DUMMY_SONG_LIST = listOf(
     Song(
         2,

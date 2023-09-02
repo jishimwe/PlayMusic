@@ -77,13 +77,14 @@ class CurrentlyPlaying private constructor() {
     fun playSong(song: Song, context: Context) {
         Log.d(TAG, "PlaySong $currentSongID -- $song.id --> $song.name")
         // Change song playing
-        if (currentlyPlaying.isPlaying && currentSongID != song.id) {
-            currentlyPlaying.pause()
+        if (currentSongID != song.id) {
+            if (currentlyPlaying.isPlaying)
+                currentlyPlaying.pause()
             currentlyPlaying.stop()
             currentlyPlaying.reset()
         }
         // Resume song playing
-        else if (currentSongID == song.id) {
+        else {
 //            currentlyPlaying.prepareAsync()
             currentlyPlaying.start()
             return

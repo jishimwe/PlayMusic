@@ -24,7 +24,10 @@ import com.ishim.playmusic.Artist
 import com.ishim.playmusic.R
 
 @Composable
-fun ArtistCard(artist: Artist) {
+fun ArtistCard(
+    artist: Artist,
+    onClickArtist: () -> Unit = {}
+) {
     Card(
         shape = MaterialTheme.shapes.medium,
         elevation = 4.dp,
@@ -71,10 +74,13 @@ fun ArtistCard(artist: Artist) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ArtistsGridView(list: List<Artist>, padding: PaddingValues) {
+fun ArtistsGridView(
+    list: List<Artist>,
+    padding: PaddingValues,
+    onClickArtist: () -> Unit = {}) {
     LazyVerticalGrid(columns = GridCells.Fixed(2), contentPadding = padding) {
         items(list) { artist ->
-            ArtistCard(artist)
+            ArtistCard(artist, onClickArtist)
         }
     }
 }

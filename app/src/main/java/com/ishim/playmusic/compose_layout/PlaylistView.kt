@@ -18,7 +18,7 @@ import com.ishim.playmusic.Playlist
 import com.ishim.playmusic.R
 
 @Composable
-fun PlaylistCard(playlist: Playlist) {
+fun PlaylistCard(playlist: Playlist, onClickPlaylist: () -> Unit = {}) {
     Card(
         modifier = Modifier.padding(6.dp).fillMaxWidth(),
         elevation = 4.dp,
@@ -47,14 +47,18 @@ fun PlaylistCard(playlist: Playlist) {
 }
 
 @Composable
-fun PlaylistCardList(list: List<Playlist>, padding: PaddingValues) {
+fun PlaylistCardList(
+    list: List<Playlist>,
+    padding: PaddingValues,
+    onClickPlaylist: () -> Unit = {}
+) {
     val listState = rememberLazyListState()
 //    val songs = MusicDB.getTracks(context)
     LazyColumn(
         state = listState,
         contentPadding = padding
     ) {
-        items(list) { playlist -> PlaylistCard(playlist = playlist) }
+        items(list) { playlist -> PlaylistCard(playlist = playlist, onClickPlaylist) }
     }
 }
 

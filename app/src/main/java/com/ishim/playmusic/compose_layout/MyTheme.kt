@@ -3,18 +3,27 @@ package com.ishim.playmusic.compose_layout
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import android.content.res.Resources.Theme
 import android.net.Uri
+import android.util.MutableInt
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -23,15 +32,25 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.ishim.playmusic.CurrentlyPlaying
 import com.ishim.playmusic.MusicDB
 import com.ishim.playmusic.PlayingActivity
 import com.ishim.playmusic.R
 import com.ishim.playmusic.Song
+import java.util.Locale
 
 data class AppBarState(
     val artist: String,
@@ -120,9 +139,22 @@ fun ScaffoldBars(songs: List<Song>, songPlaying: Song) {
 }
 
 @Composable
-//fun ScaffoldBarsGeneric(list: List<Any>, contentView: (input: List<Any>, padding: PaddingValues) -> Unit) {
-fun ScaffoldBarsGeneric(context: Context, list: List<Any>, musicDB: MusicDB?, songPlaying: Song?) {
-    val appBarState by remember { mutableStateOf(AppBarState(songPlaying?.artist ?: "artist", songPlaying?.name ?: "title")) }
+fun ScaffoldBarsGeneric(
+    context: Context,
+    list: List<Any>,
+    musicDB: MusicDB?,
+    songPlaying: Song?,
+    allDestinations: List<PlayMusicDestinations>,
+    currentScreen: PlayMusicDestinations,
+    navController: NavHostController,
+    onSelectedTab: (PlayMusicDestinations) -> Unit = {},
+    currentlyPlayingState: CurrentlyPlayingState?,
+) {
+    val appBarState by remember {
+        mutableStateOf(
+            AppBarState(
+                songPlaying?.artist ?: "artist",
+                songPlaying?.name ?: "title")) }
 
     var tabState by rememberSaveable  { mutableStateOf(0) }
 
@@ -130,7 +162,7 @@ fun ScaffoldBarsGeneric(context: Context, list: List<Any>, musicDB: MusicDB?, so
         topBar = {
             Column(
                 Modifier
-                    .background(MaterialTheme.colors.primary, RoundedCornerShape(24))
+                    .background(MaterialTheme.colors.primary, RoundedCornerShape(6))
             ) {
                 TopAppBar(
                     title = { Text(text = context.getString(R.string.app_name)) },
@@ -142,43 +174,110 @@ fun ScaffoldBarsGeneric(context: Context, list: List<Any>, musicDB: MusicDB?, so
                             )
                         }
                     })
-                MyTabsGeneric(tabState, onSelectedTab = {tabState = it})
+//                MyTabsGeneric(tabState, onSelectedTab = {tabState = it})
+                Row {
+                    allDestinations.forEach {destination ->
+                        MyTabsGenericNav(
+                            text = destination.route,
+                            icon = destination.icon,
+                            selected = destination == currentScreen,
+                            selectedTab = allDestinations.indexOf(destination),
+                            onSelectedTab = { onSelectedTab(destination) })
+                    }
+                }
             }
         },
         content = { innerPadding ->
-//            To use with @Preview
-/*            when(tabState) {
-                0 -> TrackList(list = list.filterIsInstance<Song>(), padding = innerPadding)
-                1 -> AlbumCardGrid(list = DUMMY_ALBUM_LIST, paddingValues = innerPadding)
-                2 -> ArtistsGridView(list = DUMMY_ARTIST_LIST, padding = innerPadding)
-                3 -> PlaylistCardList(list = DUMMY_PLAYLISTS, padding = innerPadding)
-                else -> TrackList(list = list.filterIsInstance<Song>(), padding = innerPadding)
-            }*/
-
-//            To use with @MusicDB
-            when(tabState) {
-                1 -> if (musicDB != null) {
-                    AlbumCardGrid(list = musicDB.albums, paddingValues = innerPadding)
-                }
-                2 -> if (musicDB != null) {
-                    ArtistsGridView(list = musicDB.artists, padding = innerPadding)
-                }
-                3 -> PlaylistCardList(list = DUMMY_PLAYLISTS, padding = innerPadding)
-                else -> if (musicDB != null) {
-                    TrackList(list = musicDB.songs, padding = innerPadding)
-                }
+            if (currentlyPlayingState != null && musicDB != null) {
+                PlayMusicNavGraph(
+                    navController = navController,
+                    modifier = Modifier.padding(innerPadding),
+                    currentlyPlayingState = currentlyPlayingState,
+                    musicDB = musicDB)
             }
         },
-        bottomBar = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .wrapContentSize(Alignment.Center)
-                    .fillMaxWidth()) {
-                BottomPlayerBar(songPlaying ?: DUMMY_SONG)
+        bottomBar =
+        {
+            if (tabState != 0) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .wrapContentSize(Alignment.Center)
+                        .fillMaxWidth()
+                ) {
+                    BottomPlayerBar(songPlaying ?: DUMMY_SONG)
+                }
             }
         }
     )
+}
+
+@Composable
+fun MyTabsGenericNav(
+    text: String,
+    icon: ImageVector,
+    selected: Boolean,
+    selectedTab: Int,
+    onSelectedTab: () -> Unit
+) {
+    val color = MaterialTheme.colors.onSurface
+    val durationMillis = if (selected) TabFadeInAnimationDuration else TabFadeOutAnimationDuration
+    val animSpec = remember {
+        tween<Color>(
+            durationMillis = durationMillis,
+            easing = LinearEasing,
+            delayMillis = TabFadeInAnimationDelay
+        )
+    }
+    val tabTintColor by animateColorAsState(
+        targetValue = if (selected) color else color.copy(alpha = InactiveTabOpacity),
+        animationSpec = animSpec,
+        label = ""
+    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(4.dp)
+            .animateContentSize()
+            .height(TabHeight*.8F)
+            .selectable(
+                selected = selected,
+                onClick = onSelectedTab,
+                role = Role.Tab,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = rememberRipple(
+                    bounded = false,
+                    radius = Dp.Unspecified,
+                    color = Color.Unspecified
+                )
+            )
+            .clearAndSetSemantics { contentDescription = text }
+            .border(1.dp, MaterialTheme.colors.secondaryVariant, CircleShape)
+    ) {
+        Icon(
+            painter = painterResource(id = RouteIconsMap[text] ?: R.drawable.ic_tracks),
+            contentDescription = text,
+            tint = tabTintColor,
+            modifier = Modifier
+                .clip(CircleShape)
+                .scale(0.7F)
+                .padding(4.dp)
+                .align(Alignment.CenterVertically))
+        if (selected) {
+            Divider(modifier = Modifier
+                .width(2.dp)
+                .fillMaxHeight(.8F))
+            Text(
+//                text.uppercase(Locale.getDefault()),
+                text = text,
+                color = tabTintColor,
+                style = MaterialTheme.typography.h4,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .align(Alignment.CenterVertically)
+            )
+        }
+    }
 }
 
 @Composable
@@ -235,7 +334,7 @@ fun MyTabsGeneric(selectedTab: Int, onSelectedTab: (Int) -> Unit) {
         backgroundColor = MaterialTheme.colors.primary,
         modifier = Modifier
             .padding(vertical = 4.dp, horizontal = 4.dp)
-            .clip(RoundedCornerShape(48))
+            .clip(RoundedCornerShape(24))
             .padding(1.dp)
             .fillMaxWidth()
             .border(1.dp, MaterialTheme.colors.onPrimary, RoundedCornerShape(48)),
@@ -271,7 +370,7 @@ fun MyTabsGeneric(selectedTab: Int, onSelectedTab: (Int) -> Unit) {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BottomPlayerBar(songPlaying: Song) {
-    var playing by remember {
+    val playing by remember {
         mutableStateOf(true)
     }
 
@@ -350,6 +449,19 @@ fun BottomPlayerBar(songPlaying: Song) {
 
 }
 
+private val TabHeight = 56.dp
+private const val InactiveTabOpacity = 0.60f
+
+private const val TabFadeInAnimationDuration = 150
+private const val TabFadeInAnimationDelay = 100
+private const val TabFadeOutAnimationDuration = 100
+private val RouteIconsMap = mapOf<String, Int>(
+    SongListView.route to R.drawable.ic_tracks,
+    AlbumListView.route to R.drawable.ic_album,
+    ArtistListView.route to R.drawable.ic_artist,
+    PlaylistView.route to R.drawable.ic_playlist
+)
+
 @Composable
 @Preview
 fun PreviewTabs() {
@@ -390,9 +502,18 @@ fun PreviewSongList() {
             "Dummy data"
         )
     }
+    val navController = rememberNavController()
     MyTheme {
         Column(modifier = Modifier.padding(8.dp)) {
-            ScaffoldBarsGeneric(LocalContext.current, songs, null, songs[0])
+            ScaffoldBarsGeneric(
+                LocalContext.current,
+                songs,
+                null,
+                songs[0],
+                playMusicTabs,
+                playMusicTabs[0],
+                navController,
+                currentlyPlayingState = null)
     }
 
 /*        val listState = rememberLazyListState()

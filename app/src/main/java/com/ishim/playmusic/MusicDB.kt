@@ -8,6 +8,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.os.Parcel
+import android.os.Parcelable
 import android.provider.MediaStore
 import android.util.Log
 import java.time.format.DateTimeFormatter
@@ -48,7 +50,7 @@ private const val TAG = "MusicDB"
 val timeFormat = DateTimeFormatter.ofPattern("mm:ss")
 
 //class MusicDB (songs: List<Song>, albums: List<Album>, artists: List<Artist>, playlists: List<Playlist>){
-class MusicDB(context: Context) {
+class MusicDB(context: Context){
 
     var songs = getTracks(context)
     var albums = getAlbums(context)

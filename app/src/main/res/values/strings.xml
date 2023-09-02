@@ -9,4 +9,6 @@
     <string name="track_title">Track Title</string>
     <string name="artist">Artist</string>
     <string name="album">Album</string>
+
+    <string name="internalUri">play_music</string>
 </resources>

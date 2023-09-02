@@ -21,7 +21,10 @@ import com.ishim.playmusic.R
 import com.ishim.playmusic.Song
 
 @Composable
-fun AlbumCard(album: Album) {
+fun AlbumCard(
+    album: Album,
+    onClickAlbum: () -> Unit
+) {
     Card(shape = MaterialTheme.shapes.medium, modifier = Modifier.padding(8.dp)) {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -53,10 +56,13 @@ fun AlbumCard(album: Album) {
 }
 
 @Composable
-fun AlbumCardGrid(list: List<Album>, paddingValues: PaddingValues) {
+fun AlbumCardGrid(
+    list: List<Album>,
+    paddingValues: PaddingValues,
+    onClickAlbum: () -> Unit = {}) {
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
         items(list) { album ->
-            AlbumCard(album)
+            AlbumCard(album, onClickAlbum)
         }
     }
 }

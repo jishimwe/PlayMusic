@@ -31,9 +31,9 @@ import java.time.LocalTime
 import java.time.ZoneId
 
 @Composable
-fun AlbumArtAndInfo(song: Song, viewModel: PlayMusicViewModel = viewModel()) {
+fun AlbumArtAndInfo(song: Song) {
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsState()
+//    val uiState by viewModel.uiState.collectAsState()
 //    val album = MusicDB.getAlbums(context, song.album)
 //    val albumArt = MusicDB.getAlbumArt(context, album[0].id)
 
@@ -65,14 +65,14 @@ fun AlbumArtAndInfo(song: Song, viewModel: PlayMusicViewModel = viewModel()) {
             )
 
             Text(
-//                text = song.name,
-                text = uiState.song?.name ?: "VIEW MODEL FAIL: title",
+                text = song.name,
+//                text = uiState.song.value.name ?: "VIEW MODEL FAIL: title",
                 style = MaterialTheme.typography.h6
             )
 
             Text(
-//                text = song.artist,
-                text = uiState.song?.artist ?: "VIEW MODEL FAIL: artist",
+                text = song.artist,
+//                text = uiState.song.value.artist ?: "VIEW MODEL FAIL: artist",
                 style = MaterialTheme.typography.body1,
                 maxLines = 1,
                 modifier = Modifier
@@ -82,8 +82,8 @@ fun AlbumArtAndInfo(song: Song, viewModel: PlayMusicViewModel = viewModel()) {
             Spacer(modifier = Modifier.width(4.dp))
 
             Text(
-//                text = song.album,
-                text = uiState.song?.album ?: "VIEW MODEL FAIL: album",
+                text = song.album,
+//                text = uiState.song.value.album ?: "VIEW MODEL FAIL: album",
                 style = MaterialTheme.typography.body1,
                 maxLines = 1,
                 modifier = Modifier
@@ -97,8 +97,7 @@ fun AlbumArtAndInfo(song: Song, viewModel: PlayMusicViewModel = viewModel()) {
 @Composable
 fun MediaButtonAndProgressBar(
     song: Song,
-    currentlyPlaying: CurrentlyPlaying?,
-    viewModel: PlayMusicViewModel = viewModel()
+    currentlyPlaying: CurrentlyPlaying?
 ) {
     val timeElapsed by remember {
         mutableStateOf(0)
@@ -110,8 +109,10 @@ fun MediaButtonAndProgressBar(
 
     val context = LocalContext.current
 
+//    viewModel.whenSongPlayedChange(song)
     currentlyPlaying?.playSong(song, context)
-    val uiState by viewModel.uiState.collectAsState()
+//    val uiState by viewModel.uiState.collectAsState()
+//    uiState.currentlyPlaying.playSong(uiState.song.value, context)
 
     var playing by remember {
         mutableStateOf(true)
@@ -257,7 +258,7 @@ fun MediaButtonAndProgressBar(
 }
 
 @Composable
-fun PlayingView(song: Song, currentlyPlaying: CurrentlyPlaying?, viewModel: PlayMusicViewModel) {
+fun PlayingView(song: Song, currentlyPlaying: CurrentlyPlaying?) {
         Column(
             verticalArrangement = Arrangement.SpaceAround,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -265,11 +266,11 @@ fun PlayingView(song: Song, currentlyPlaying: CurrentlyPlaying?, viewModel: Play
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            AlbumArtAndInfo(song, viewModel)
+            AlbumArtAndInfo(song)
 
             Spacer(modifier = Modifier.width(18.dp))
 
-            MediaButtonAndProgressBar(song, currentlyPlaying, viewModel)
+            MediaButtonAndProgressBar(song, currentlyPlaying)
         }
 }
 
@@ -289,5 +290,5 @@ fun AlbumArtAndInfoPreview() {
 
 //    val currentlyPlaying = CurrentlyPlaying(LocalContext.current, MediaPlayer(), null, song.id)
 //    val viewModel: PlayMusicViewModel by viewModels()
-    PlayingView(song = song, null, PlayMusicViewModel())
+    PlayingView(song = song, null)
 }

@@ -33,7 +33,7 @@ import java.time.format.DateTimeFormatter
 const val SONG_ID = "SongID"
 
 @Composable
-fun SongCard(song: Song) {
+fun SongCard(song: Song, onClickSong: (Long) -> Unit = {} ) {
     val context = LocalContext.current
     val intentPlayer = Intent(context, PlayingActivity::class.java)
 
@@ -46,8 +46,9 @@ fun SongCard(song: Song) {
         elevation = 8.dp,
         modifier = Modifier
             .clickable {
-                intentPlayer.putExtra(SONG_ID, song.id)
-                context.startActivity(intentPlayer)
+//                intentPlayer.putExtra(SONG_ID, song.id)
+//                context.startActivity(intentPlayer)
+                onClickSong(song.id)
             }
             .animateContentSize()
             .clip(RoundedCornerShape(8.dp))
@@ -137,7 +138,7 @@ fun SongCard(song: Song) {
 }
 
 @Composable
-fun TrackList(list: List<Song>, padding: PaddingValues) {
+fun TrackList(list: List<Song>, padding: PaddingValues, onClickSong: (Long) -> Unit = {}) {
     val listState = rememberLazyListState()
 //    val songs = MusicDB.getTracks(context)
     LazyColumn(
@@ -145,7 +146,7 @@ fun TrackList(list: List<Song>, padding: PaddingValues) {
         contentPadding = padding,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(list) { track -> SongCard(song = track) }
+        items(list) { track -> SongCard(song = track, onClickSong = onClickSong) }
     }
 }
 

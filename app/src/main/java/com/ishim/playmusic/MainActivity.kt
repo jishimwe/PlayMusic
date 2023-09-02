@@ -8,12 +8,24 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.compose.rememberNavController
 import com.ishim.playmusic.compose_layout.MyTheme
+import com.ishim.playmusic.compose_layout.PlayMusicApp
+import com.ishim.playmusic.compose_layout.PlayMusicViewModel
 import com.ishim.playmusic.compose_layout.ScaffoldBarsGeneric
+import com.ishim.playmusic.compose_layout.playMusicTabs
+import kotlinx.coroutines.launch
 
-private const val TAG = "MAIN ACTIVITY"
+private const val TAG = "MainActivity"
 const val MANAGE_MEDIA_REQUEST_CODE = 1
 const val READ_EXTERNAL_STORAGE_CODE = 2
 const val ACCESS_MEDIA_LOCATION_CODE = 3
@@ -30,13 +42,47 @@ class MainActivity : AppCompatActivity() {
         val musicDB = MusicDB(this)
 
 //        val currentlyPlaying = CurrentlyPlaying(this, MediaPlayer(), null)
+        val viewModel: PlayMusicViewModel by viewModels()
+        Log.d(TAG, "Before creating the view")
 
-        setContent {
-            MyTheme {
-//                ScaffoldBars(songs = MusicDB.getTracks(this))
-                ScaffoldBarsGeneric(context = this, list = listOf(), musicDB, null)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { currentlyPlayingState ->
+                    setContent {
+                        /*MyTheme {
+                            val navController = rememberNavController()
+                            Log.d(TAG, "${it.song.value.id} -- ${it.song.value.name} -- ${it.song.value}")
+                            ScaffoldBarsGeneric(
+                                context = LocalContext.current,
+                                list = listOf(),
+                                musicDB = musicDB,
+                                songPlaying = it.song.value,
+                                allDestinations = playMusicTabs,
+                                navController = navController,
+                                currentScreen = playMusicTabs[0],
+                                currentlyPlayingState = null
+                            )
+                        }*/
+                        PlayMusicApp(musicDB = musicDB, currentlyPlayingState = currentlyPlayingState)
+                    }
+                }
             }
         }
+
+/*        lifecycleScope.launch {
+            viewModel.uiState.collect {
+                setContent {
+                    PlayMusicApp(musicDB = musicDB, currentlyPlayingState = it)
+                }
+            }
+        }*/
+/*        setContent {
+            MyTheme {
+//                ScaffoldBars(songs = MusicDB.getTracks(this))
+                val uiState by viewModel.uiState.collectAsState()
+                ScaffoldBarsGeneric(context = this, list = listOf(), musicDB, uiState.song.value)
+            }
+        }*/
     }
 
     val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
